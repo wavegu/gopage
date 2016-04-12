@@ -5,9 +5,9 @@ import random
 import time
 import json
 
-from search_helper.search_helper import BaiduHelper
-from search_helper.search_helper import HaosouHelper
-from search_helper.search_helper import SogouHelper
+from search_helper import BaiduHelper
+from search_helper import HaosouHelper
+from search_helper import SogouHelper
 
 import sys
 reload(sys)
