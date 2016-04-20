@@ -17,16 +17,16 @@ class GoogleItem:
     def __init__(self):
         self.title = ''
         self.content = ''
-        self.cite_url = ''
-        self.cite_name = ''
+        self.source_url = ''
+        self.source_name = ''
         self.email_list = []
 
     def to_dict(self):
         return {
             'title': self.title,
             'content': self.content,
-            'cite_url': self.cite_url,
-            'cite_name': self.cite_name,
+            'source_url': self.source_url,
+            'source_name': self.source_name,
         }
 
 
@@ -40,8 +40,7 @@ class GoogleItemParser(HTMLParser):
         self.tem_googleItem = GoogleItem()
         self.is_in_title = False
         self.is_in_content = False
-        self.is_in_cite_url = False
-        self.is_in_cite_name = False
+        self.is_in_source_name = False
         self.google_item_list = []
         self.content_span_num = 0
 
@@ -61,13 +60,13 @@ class GoogleItemParser(HTMLParser):
                     self.tem_googleItem = GoogleItem()
                     break
                 if variable == 'class' and value == 'crl':
-                    self.is_in_cite_name = True
+                    self.is_in_source_name = True
                     break
 
-        elif tag == 'cite':
+        elif tag == 'a' and self.is_in_title:
             for (variable, value) in attrs:
-                if variable == 'class' and value == '_Rm':
-                    self.is_in_cite_url = True
+                if variable == 'href':
+                    self.tem_googleItem.source_url = value
                     break
 
     def handle_endtag(self, tag):
@@ -75,12 +74,8 @@ class GoogleItemParser(HTMLParser):
             self.is_in_title = False
             return
 
-        if self.is_in_cite_url and tag == 'cite':
-            self.is_in_cite_url = False
-            return
-
-        if self.is_in_cite_name and tag == 'div':
-            self.is_in_cite_name = False
+        if self.is_in_source_name and tag == 'div':
+            self.is_in_source_name = False
             return
 
         if self.is_in_content and tag == 'span':
@@ -103,10 +98,8 @@ class GoogleItemParser(HTMLParser):
     def handle_data(self, data):
         if self.is_in_title:
             self.tem_googleItem.title += data
-        if self.is_in_cite_url:
-            self.tem_googleItem.cite_url += data
-        if self.is_in_cite_name:
-            self.tem_googleItem.cite_name += data
+        if self.is_in_source_name:
+            self.tem_googleItem.source_name += data
         if self.is_in_content:
             self.tem_googleItem.content += data
 
